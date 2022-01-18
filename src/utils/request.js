@@ -1,6 +1,7 @@
 import axios from 'axios'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { debug } from 'script-ext-html-webpack-plugin/lib/common'
 
 // 创建 axios 的实例
 const service = axios.create({
@@ -13,7 +14,7 @@ service.interceptors.request.use(
   config => {
     // 请求成功处理，判断浏览器中的cookie中是否存在项目的token
     if (store.getters.token) {
-      config.headers['X-Token'] = getToken()
+      config.headers['moyu-token'] = getToken()
     }
     return config
   },
@@ -29,10 +30,7 @@ service.interceptors.response.use(
   // 具体的code对应的处理可继续添加修改
   response => {
     const res = response.data
-    if (response.data.code === 200) {
-      console.log('请求成功')
-    }
-    if (response.data.code === 300) {
+    if (response.data.status !== 200) {
       console.log(response.data.msg)
     }
     return response

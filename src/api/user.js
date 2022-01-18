@@ -1,4 +1,3 @@
-import request from '@/utils/request'
 import { get, post } from '@/utils/request'
 
 // 用户登录
@@ -7,17 +6,8 @@ export const login = params => post('/sysUser/doLogin', params)
 // 提交用户信息
 export const saveUser = params => post('/sysUser/save', params)
 
-export function getInfo(token) {
-  return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
-  })
-}
+// 获取用户信息
+export const getInfo = params => post('/sysUser/getUser', params)
 
-export function logout() {
-  return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
-  })
-}
+// 用户注销
+export const logout = () => get('/sysUser/logOut', null)
