@@ -30,13 +30,9 @@ service.interceptors.response.use(
   // 具体的code对应的处理可继续添加修改
   response => {
     const res = response.data
-    if (response.data.status !== 200) {
-      console.log(response.data.msg)
-    }
-    return response
+    return res
   },
   error => {
-    // TODO:具体的code对应的处理可继续添加修改
     if (error.response.code === 301) {
       console.log('登录过期')
       // 登录过期跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面 ---主页(index) 或者 退出到登录前的浏览的页面
