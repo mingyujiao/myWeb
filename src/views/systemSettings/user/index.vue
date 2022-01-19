@@ -92,7 +92,7 @@ export default {
     // 获取后台数据
     getData() {
       let param = {...this.pageParam, ...this.queryForm}
-      queryUserListPage(this.pageParam).then(res => {
+      queryUserListPage(param).then(res => {
         if (res.code === 200) {
           this.tableData = res.data.records
           this.pageParam.total = res.data.total
