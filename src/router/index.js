@@ -58,7 +58,7 @@ export const constantRoutes = [
   {
     path: '/example',
     component: Layout,
-    redirect: '/example/table',
+    // redirect: '/example/table',
     name: 'Example',
     meta: { title: 'Example', icon: 'el-icon-s-help' },
     children: [
@@ -74,6 +74,28 @@ export const constantRoutes = [
         component: () => import('@/views/tree/index'),
         meta: { title: 'Tree', icon: 'tree' }
       }
+    ]
+  },
+
+  {
+    path: '/systemSettings',
+    component: Layout,
+    // redirect: '/example/table',
+    name: '系统管理',
+    meta: { title: '系统管理', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'user',
+        name: '用户管理',
+        component: () => import('@/views/systemSettings/user/index'),
+        meta: { title: '用户管理', icon: 'el-icon-user' }
+      },
+      {
+        path: 'role',
+        name: '系统角色',
+        component: () => import('@/views/systemSettings/role/index'),
+        meta: { title: '系统角色', icon: 'el-icon-user-solid' }
+      },
     ]
   },
 

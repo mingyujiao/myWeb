@@ -11,3 +11,6 @@ export const getInfo = params => post('/sysUser/getUser', params)
 
 // 用户注销
 export const logout = () => get('/sysUser/logOut', null)
+
+// 分页查询用户信息
+export const queryUserListPage = params => post('/sysUser/queryListPage', params)
