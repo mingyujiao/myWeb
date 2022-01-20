@@ -29,16 +29,21 @@
         </el-form>
       </el-collapse-item>
     </el-collapse>
-    <el-table border :data="tableData" style="width: 100%; height: 100%;" :size="btnSize" stripe>
-      <el-table-column fixed prop="userCode" label="用户编码" width="150" align="center"></el-table-column>
+    <div>
+      <el-button type="primary" plain icon="el-icon-plus" @click="addUser" :size="btnSize">添 加</el-button>
+      <el-button type="danger" plain icon="el-icon-delete" @click="queryData" :size="btnSize">删 除</el-button>
+    </div>
+    <el-table border :data="tableData" style="width: 100%; height: 100%;" :size="btnSize" stripe v-loading="listLoading">
+      <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
+      <el-table-column prop="userCode" label="用户编码" width="150" align="center"></el-table-column>
       <el-table-column prop="username" label="用户名称" width="120" align="center"></el-table-column>
-      <el-table-column prop="province" label="邮箱" align="center"></el-table-column>
+      <el-table-column prop="email" label="邮箱" align="center"></el-table-column>
       <el-table-column prop="phoneNum" label="手机号" align="center"></el-table-column>
       <el-table-column prop="birthday" label="出生日期" align="center"></el-table-column>
       <el-table-column prop="name" label="真实名称" width="120" align="center"></el-table-column>
       <el-table-column prop="idCard" label="身份证" width="120" align="center"></el-table-column>
       <el-table-column prop="nationality" label="民族" width="120" align="center"></el-table-column>
-      <el-table-column prop="createDate" label="创建时间" width="120" align="center"></el-table-column>
+      <el-table-column prop="createDate" label="创建时间" width="200" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
     </el-table>
     <div style="text-align: center">
@@ -54,6 +59,7 @@
       >
       </el-pagination>
     </div>
+    <add-user ref="addUser"></add-user>
   </div>
 </template>
 
@@ -61,10 +67,15 @@
 
 import { queryUserListPage } from '@/api/user'
 import { BTN_SIZE, ERR_MSG, PAGE_SMALL } from '@/utils/constant'
+import addUser from '@/views/systemSettings/user/addUser'
 
 export default {
+  components: {
+    addUser
+  },
   data() {
     return {
+      listLoading: false,
       pageSmall: PAGE_SMALL,
       btnSize: BTN_SIZE,
       queryForm: {
@@ -81,6 +92,10 @@ export default {
     }
   },
   methods: {
+    // 添加用户
+    addUser() {
+      this.$refs.addUser.show()
+    },
     // 查询
     queryData() {
       this.getData()
@@ -88,10 +103,11 @@ export default {
     // 清空查询条件
     resetData() {
       Object.keys(this.queryForm).forEach(key => (this.queryForm[key] = null))
+      this.getData()
     },
     // 获取后台数据
     getData() {
-      let param = {...this.pageParam, ...this.queryForm}
+      let param = {...this.pageParam, data: this.queryForm}
       queryUserListPage(param).then(res => {
         if (res.code === 200) {
           this.tableData = res.data.records

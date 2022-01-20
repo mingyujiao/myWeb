@@ -1,7 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
-import { debug } from 'script-ext-html-webpack-plugin/lib/common'
 
 // 创建 axios 的实例
 const service = axios.create({
@@ -29,11 +28,11 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   // 具体的code对应的处理可继续添加修改
   response => {
-    const res = response.data
-    return res
+    return response.data
   },
   error => {
-    if (error.response.code === 301) {
+    // 除了登录过期，其他都不处理
+    if (error.response.data.code === 301) {
       console.log('登录过期')
       // 登录过期跳转登录页面，并将要浏览的页面fullPath传过去，登录成功后跳转需要访问的页面 ---主页(index) 或者 退出到登录前的浏览的页面
       // 这样登录页面登录接口成功之后可以进行跳转 主页(index) 或者 退出到登录前的页面： let path = this.$route.query.redirect || '/index.js';   this.$router.push(path);
@@ -47,10 +46,7 @@ service.interceptors.response.use(
       }, 1000)
       localStorage.setItem('token', '') // 清除token
     }
-    if (error.response.code === 500) {
-      console.log('请联系管理员')
-    }
-    return Promise.reject(error)
+    return error.response.data
   }
 )
 
