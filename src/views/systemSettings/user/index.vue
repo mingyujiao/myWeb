@@ -33,7 +33,9 @@
       <el-button type="primary" plain icon="el-icon-plus" @click="addUser" :size="btnSize">添 加</el-button>
       <el-button type="danger" plain icon="el-icon-delete" @click="queryData" :size="btnSize">删 除</el-button>
     </div>
-    <el-table border :data="tableData" style="width: 100%; height: 100%;" :size="btnSize" stripe v-loading="listLoading">
+    <el-table border :data="tableData" style="width: 100%; height: 100%;" :size="btnSize" stripe v-loading="listLoading"
+              @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
       <el-table-column prop="userCode" label="用户编码" width="150" align="center"></el-table-column>
       <el-table-column prop="username" label="用户名称" width="120" align="center"></el-table-column>
@@ -45,6 +47,13 @@
       <el-table-column prop="nationality" label="民族" width="120" align="center"></el-table-column>
       <el-table-column prop="createDate" label="创建时间" width="200" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
+      <el-table-column label="操作" width="120" align="center">
+        <template slot-scope="scope">
+          <el-button plain @click.native.prevent="editRow(scope.row)" type="warning" :size="btnSize">
+            修改
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div style="text-align: center">
       <el-pagination
@@ -75,6 +84,7 @@ export default {
   },
   data() {
     return {
+      selections: [],
       listLoading: false,
       pageSmall: PAGE_SMALL,
       btnSize: BTN_SIZE,
@@ -92,6 +102,14 @@ export default {
     }
   },
   methods: {
+    // 修改
+    editRow(row) {
+      this.$refs.addUser.show(row)
+    },
+    // 多选
+    handleSelectionChange(val) {
+      this.selections = val
+    },
     // 添加用户
     addUser() {
       this.$refs.addUser.show()

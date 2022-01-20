@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :before-close="handleClose" :visible.sync="dialogVisible" title="添加用户">
+    <el-dialog :before-close="handleClose" :visible.sync="dialogVisible" :title="titleName">
       <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -13,7 +13,7 @@
           <el-col :span="12">
             <el-form-item label="用户名称" prop="username">
               <el-input v-model="formData.username" placeholder="请输入用户名称" :maxlength="20" clearable
-                        :style="{width: '100%'}"
+                        :style="{width: '100%'}" autocomplete="off"
               ></el-input>
             </el-form-item>
           </el-col>
@@ -22,12 +22,12 @@
           <el-col :span="12">
             <el-form-item label="密码" prop="password">
               <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
-                        :style="{width: '100%'}"
+                        :style="{width: '100%'}" autocomplete="off" type="password"
               ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="开关" prop="state" required>
+            <el-form-item label="启用" prop="state" required>
               <el-switch v-model="formData.state" :active-value="0" :inactive-value="1"></el-switch>
             </el-form-item>
           </el-col>
@@ -57,7 +57,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="phoneNum">
-              <el-input v-model="formData.phoneNum" placeholder="请输入手机号" :maxlength="15" clearable
+              <el-input v-model="formData.phoneNum" placeholder="请输入手机号" :maxlength="11" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
@@ -90,15 +90,48 @@
 <script>
 import { saveUser } from '@/api/user'
 import { SUCCESS_MSG } from '@/utils/constant'
+import { isNumber, validIdCard, validNumStr, validPhoneNum } from '@/utils/validate'
 
 export default {
   name: 'add',
   components: {},
   props: [],
   data() {
+    // 校验用户编码
+    const checkUserCode = (rule, value, callback) => {
+      if (!isNumber(value)) {
+        return callback(new Error('请输入 0~9 的数字'))
+      }
+      return callback()
+    }
+    // 校验用户名
+    const validUsername = (rule, value, callback) => {
+      if (!validNumStr(value)) {
+        return callback(new Error('请输入英文加数字'))
+      }
+      return callback()
+    }
+    // 校验身份证号码
+    let checkIdCard = (rule, value, callback) => {
+      if (value) {
+        if (!validIdCard(value)) {
+          return callback(new Error('身份证号码错误'))
+        }
+      }
+      return callback()
+    }
+    // 校验手机号
+    const checkPhoneNum = (rule, value, callback) => {
+      if (value) {
+        if (!validPhoneNum) {
+          return callback(new Error('手机号格式错误'))
+        }
+      }
+      return callback()
+    }
     return {
-
       dialogVisible: false,
+      titleName: '',
       formData: {
         userCode: undefined,
         username: undefined,
@@ -112,35 +145,31 @@ export default {
         birthday: null
       },
       rules: {
-        userCode: [{
-          required: true,
-          message: '请输入用户编码',
-          trigger: 'blur'
-        }],
-        username: [{
-          required: true,
-          message: '请输入用户名称',
-          trigger: 'blur'
-        }],
-        password: [{
-          required: true,
-          message: '请输入密码',
-          trigger: 'blur'
-        }],
-        name: [{
-          required: true,
-          message: '请输入真实名称',
-          trigger: 'blur'
-        }],
-        idCard: [],
+        userCode: [
+          { required: true, message: '请输入用户编码', trigger: 'blur' },
+          { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' },
+          { validator: checkUserCode, trigger: 'blur' }
+        ],
+        username: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+          { validator: validUsername, trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入真实名称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+        ],
+        idCard: [{ validator: checkIdCard, trigger: 'blur' }],
         nationality: [],
-        phoneNum: [],
-        email: [],
-        birthday: [{
-          required: true,
-          message: '请选择出生日期',
-          trigger: 'change'
-        }]
+        phoneNum: [{ validator: checkPhoneNum, trigger: 'blur' }],
+        email: [
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] },
+        ],
+        birthday: []
       }
     }
   },
@@ -159,7 +188,12 @@ export default {
         .catch(_ => {
         })
     },
-    show() {
+    show(val) {
+      this.titleName = '添加用户'
+      if (val) {
+        this.titleName = '修改用户'
+        this.formData = {...val}
+      }
       this.dialogVisible = true
     },
     onClose() {
