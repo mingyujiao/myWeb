@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :before-close="handleClose" :visible.sync="dialogVisible" :title="titleName">
+    <el-dialog :visible.sync="dialogVisible" :title="titleName">
       <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -15,20 +15,6 @@
               <el-input v-model="formData.username" placeholder="请输入用户名称" :maxlength="20" clearable
                         :style="{width: '100%'}" autocomplete="off"
               ></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="密码" prop="password">
-              <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
-                        :style="{width: '100%'}" autocomplete="off" type="password"
-              ></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="启用" prop="state" required>
-              <el-switch v-model="formData.state" :active-value="0" :inactive-value="1"></el-switch>
             </el-form-item>
           </el-col>
         </el-row>
@@ -71,10 +57,24 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="出生日期" prop="birthday">
+            <el-form-item label="出生日期">
               <el-date-picker v-model="formData.birthday" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
                               :style="{width: '100%'}" placeholder="请选择出生日期" clearable
               ></el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12" v-if="!formData.userId">
+            <el-form-item label="密码" prop="password">
+              <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
+                        :style="{width: '100%'}" autocomplete="off" type="password"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="启用" prop="state">
+              <el-switch v-model="formData.state" :active-value="0" :inactive-value="1"></el-switch>
             </el-form-item>
           </el-col>
         </el-row>
@@ -123,7 +123,7 @@ export default {
     // 校验手机号
     const checkPhoneNum = (rule, value, callback) => {
       if (value) {
-        if (!validPhoneNum) {
+        if (!validPhoneNum(value)) {
           return callback(new Error('手机号格式错误'))
         }
       }
@@ -133,6 +133,7 @@ export default {
       dialogVisible: false,
       titleName: '',
       formData: {
+        userId: undefined,
         userCode: undefined,
         username: undefined,
         password: undefined,
@@ -152,7 +153,7 @@ export default {
         ],
         username: [
           { required: true, message: '请输入用户名称', trigger: 'blur' },
-          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+          { min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' },
           { validator: validUsername, trigger: 'blur' }
         ],
         password: [
@@ -164,12 +165,11 @@ export default {
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         idCard: [{ validator: checkIdCard, trigger: 'blur' }],
-        nationality: [],
         phoneNum: [{ validator: checkPhoneNum, trigger: 'blur' }],
         email: [
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] },
         ],
-        birthday: []
+        birthday: [],
       }
     }
   },
@@ -180,14 +180,6 @@ export default {
   mounted() {
   },
   methods: {
-    handleClose() {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          this.onClose()
-        })
-        .catch(_ => {
-        })
-    },
     show(val) {
       this.titleName = '添加用户'
       if (val) {
@@ -198,6 +190,8 @@ export default {
     },
     onClose() {
       this.$refs['elForm'].resetFields()
+      Object.keys(this.formData).forEach(key => (this.formData[key] = undefined))
+      this.formData.state = 0
       this.dialogVisible = false
     },
     handelConfirm() {

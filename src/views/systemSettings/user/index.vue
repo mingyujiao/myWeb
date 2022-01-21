@@ -31,7 +31,7 @@
     </el-collapse>
     <div>
       <el-button type="primary" plain icon="el-icon-plus" @click="addUser" :size="btnSize">添 加</el-button>
-      <el-button type="danger" plain icon="el-icon-delete" @click="queryData" :size="btnSize">删 除</el-button>
+      <el-button type="danger" plain icon="el-icon-delete" @click="delUser" :size="btnSize">删 除</el-button>
     </div>
     <el-table border :data="tableData" style="width: 100%; height: 100%;" :size="btnSize" stripe v-loading="listLoading"
               @selection-change="handleSelectionChange">
@@ -55,7 +55,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div style="text-align: center">
+    <div style="text-align: right">
       <el-pagination
         :small="pageSmall"
         @size-change="handleSizeChange"
@@ -74,8 +74,8 @@
 
 <script>
 
-import { queryUserListPage } from '@/api/user'
-import { BTN_SIZE, ERR_MSG, PAGE_SMALL } from '@/utils/constant'
+import { deletesUserByIds, queryUserListPage } from '@/api/user'
+import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, PAGE_SMALL, SUCCESS_MSG } from '@/utils/constant'
 import addUser from '@/views/systemSettings/user/addUser'
 
 export default {
@@ -102,6 +102,23 @@ export default {
     }
   },
   methods: {
+    // 删除用户信息
+    delUser() {
+      if (this.selections.length === 0) {
+        this.$message.warning(DEL_NULL_MSG)
+        return
+      }
+      this.listLoading = true
+      deletesUserByIds([]).then(res => {
+        if (res.code === 200) {
+          this.$message.success(SUCCESS_MSG)
+          this.getData()
+        } else {
+          this.$message.error(ERR_MSG)
+        }
+        this.listLoading = false
+      })
+    },
     // 修改
     editRow(row) {
       this.$refs.addUser.show(row)

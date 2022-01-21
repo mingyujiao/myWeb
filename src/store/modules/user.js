@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { Message } from 'element-ui'
 
 const getDefaultState = () => {
   return {
@@ -33,8 +34,12 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
-        commit('SET_TOKEN', response.data.tokenValue)
-        setToken(response.data.tokenValue)
+        if (response.code === 200) {
+          commit('SET_TOKEN', response.data.tokenValue)
+          setToken(response.data.tokenValue)
+        } else {
+          Message.error('用户名或密码错误！')
+        }
         resolve()
       }).catch(error => {
         reject(error)

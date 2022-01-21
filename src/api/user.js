@@ -14,3 +14,6 @@ export const logout = () => get('/sysUser/logOut', null)
 
 // 分页查询用户信息
 export const queryUserListPage = params => post('/sysUser/queryListPage', params)
+
+// 批量删除用户信息
+export const deletesUserByIds = params => post('/sysUser/deletes', params)
