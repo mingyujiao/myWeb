@@ -91,6 +91,7 @@
 import { saveUser } from '@/api/user'
 import { SUCCESS_MSG } from '@/utils/constant'
 import { isNumber, validIdCard, validNumStr, validPhoneNum } from '@/utils/validate'
+import { getMd5Pwd } from '@/utils/crypto'
 
 export default {
   name: 'add',
@@ -197,12 +198,18 @@ export default {
     handelConfirm() {
       this.$refs['elForm'].validate(valid => {
         if (!valid) return
+        let pwd = this.formData.password
+        if (!this.formData.userId) {
+          // 将用户输入的密码进行 MD5 加密
+          this.formData.password = getMd5Pwd(this.formData.password)
+        }
         saveUser(this.formData).then(res => {
-          if (res.code === 200) {
+          if (res.data.code === 200) {
             this.$message.success(SUCCESS_MSG)
             this.onClose()
             this.$parent.getData()
           } else {
+            this.formData.password = pwd
             this.$message.error(res.message)
           }
         })

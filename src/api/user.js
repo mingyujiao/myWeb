@@ -17,3 +17,6 @@ export const queryUserListPage = params => post('/sysUser/queryListPage', params
 
 // 批量删除用户信息
 export const deletesUserByIds = params => post('/sysUser/deletes', params)
+
+// 删除用户信息
+export const deletesUserById = params => post('/sysUser/delete', params)

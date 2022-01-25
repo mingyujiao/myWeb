@@ -28,7 +28,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   // 具体的code对应的处理可继续添加修改
   response => {
-    return response.data
+    return response
   },
   error => {
     // 除了登录过期，其他都不处理
@@ -46,7 +46,7 @@ service.interceptors.response.use(
       }, 1000)
       localStorage.setItem('token', '') // 清除token
     }
-    return error.response.data
+    return error.response
   }
 )
 
