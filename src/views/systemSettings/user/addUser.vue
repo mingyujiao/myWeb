@@ -108,7 +108,7 @@ export default {
     // 校验用户名
     const validUsername = (rule, value, callback) => {
       if (!validNumStr(value)) {
-        return callback(new Error('请输入英文加数字'))
+        return callback(new Error('请输入英文或数字'))
       }
       return callback()
     }

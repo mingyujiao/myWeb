@@ -2,6 +2,7 @@ import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import { Message } from 'element-ui'
+import { getMd5Pwd } from '@/utils/crypto'
 
 const getDefaultState = () => {
   return {
@@ -33,10 +34,10 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: getMd5Pwd(password) }).then(response => {
         if (response.data.code === 200) {
-          commit('SET_TOKEN', response.data.tokenValue)
-          setToken(response.data.tokenValue)
+          commit('SET_TOKEN', response.data.data.tokenValue)
+          setToken(response.data.data.tokenValue)
         } else {
           Message.error('用户名或密码错误！')
         }
