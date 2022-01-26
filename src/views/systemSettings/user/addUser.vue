@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog :visible.sync="dialogVisible" :title="titleName">
-      <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="100px">
+      <el-form ref="elForm" :model="formData" :rules="rules" :size="btnSize" label-width="100px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户编码" prop="userCode">
@@ -89,7 +89,7 @@
 
 <script>
 import { saveUser } from '@/api/user'
-import { SUCCESS_MSG } from '@/utils/constant'
+import { BTN_SIZE, SUCCESS_MSG } from '@/utils/constant'
 import { isNumber, validIdCard, validNumStr, validPhoneNum } from '@/utils/validate'
 import { getMd5Pwd } from '@/utils/crypto'
 
@@ -131,6 +131,7 @@ export default {
       return callback()
     }
     return {
+      btnSize: BTN_SIZE,
       dialogVisible: false,
       titleName: '',
       formData: {
@@ -210,7 +211,7 @@ export default {
             this.$parent.getData()
           } else {
             this.formData.password = pwd
-            this.$message.error(res.message)
+            this.$message.error(res.data.message)
           }
         })
       })

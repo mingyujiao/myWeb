@@ -20,3 +20,6 @@ export const deletesUserByIds = params => post('/sysUser/deletes', params)
 
 // 删除用户信息
 export const deletesUserById = params => post('/sysUser/delete', params)
+
+// 修改用户密码
+export const resetPwd = params => post('/sysUser/resetPwd', params)

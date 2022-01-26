@@ -35,7 +35,8 @@
     </div>
     <el-table border :data="tableData" style="width: 100%; height: 100%;"
               :size="btnSize" stripe v-loading="listLoading"
-              @selection-change="handleSelectionChange">
+              @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
       <el-table-column fixed prop="username" label="用户名称" width="120" align="center"></el-table-column>
@@ -50,11 +51,15 @@
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
       <el-table-column label="操作" width="220" align="center">
         <template slot-scope="scope">
-          <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary" :size="btnSize">
+          <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary"
+                     :size="btnSize"
+          >
           </el-button>
-          <el-button circle @click.native.prevent="delRow(scope.row)" icon="el-icon-delete" type="danger" :size="btnSize">
+          <el-button circle @click.native.prevent="delRow(scope.row)" icon="el-icon-delete" type="danger"
+                     :size="btnSize"
+          >
           </el-button>
-          <el-button plain @click.native.prevent="editRow(scope.row)" type="warning" :size="btnSize">
+          <el-button plain @click.native.prevent="editPwd(scope.row)" type="warning" :size="btnSize">
             重置密码
           </el-button>
         </template>
@@ -73,22 +78,58 @@
       >
       </el-pagination>
     </div>
+    <el-dialog :visible.sync="dialogVisible" title="修改密码">
+      <el-form ref="elForm" :model="formData" :rules="rules" :size="btnSize" label-width="100px">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="新密码" prop="password">
+              <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
+                        :style="{width: '100%'}" autocomplete="off" type="password"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="确认密码" prop="enterPwd">
+              <el-input v-model="formData.enterPwd" placeholder="请输入密码" clearable show-password
+                        :style="{width: '100%'}" autocomplete="off" type="password"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="onClose">取消</el-button>
+        <el-button type="primary" @click="handelConfirm">确定</el-button>
+      </div>
+    </el-dialog>
     <add-user ref="addUser"></add-user>
   </div>
 </template>
 
 <script>
 
-import { deletesUserById, deletesUserByIds, queryUserListPage } from '@/api/user'
+import { deletesUserById, deletesUserByIds, queryUserListPage, resetPwd } from '@/api/user'
 import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, PAGE_SMALL, SUCCESS_MSG } from '@/utils/constant'
 import addUser from '@/views/systemSettings/user/addUser'
+import { getMd5Pwd } from '@/utils/crypto'
 
 export default {
   components: {
     addUser
   },
   data() {
+    const checkPwd = (rule, value, callback) => {
+      if (this.formData.password && this.formData.enterPwd) {
+        if (this.formData.password !== this.formData.enterPwd) {
+          return callback(new Error('密码不一致'))
+        }
+      }
+      return callback()
+    }
     return {
+      dialogVisible: false,
       selections: [],
       listLoading: false,
       pageSmall: PAGE_SMALL,
@@ -96,17 +137,65 @@ export default {
       queryForm: {
         username: null,
         name: null,
-        userCode: null,
+        userCode: null
+      },
+      formData: {
+        username: undefined,
+        userId: undefined,
+        password: undefined,
+        enterPwd: undefined
+      },
+      rules: {
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur' }
+        ],
+        enterPwd: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur' },
+          { validator: checkPwd, trigger: 'blur' }
+        ]
       },
       pageParam: {
         current: 1,
         size: 10,
-        total: 0,
+        total: 0
       },
       tableData: []
     }
   },
   methods: {
+    // 重置密码确认
+    handelConfirm() {
+      this.$refs['elForm'].validate(valid => {
+        if (!valid) return
+        let pwd = this.formData.password
+        this.formData.password = getMd5Pwd(this.formData.password)
+        this.formData.enterPwd = getMd5Pwd(this.formData.enterPwd)
+        resetPwd(this.formData).then(res => {
+        if (res.data.code === 200) {
+          this.$message.success(SUCCESS_MSG)
+          this.onClose()
+          this.getData()
+        } else {
+          this.formData.password = pwd
+          this.formData.enterPwd = pwd
+          this.$message.error(res.data.message)
+        }
+      })
+      })
+    },
+    // 重置密码关闭弹窗
+    onClose() {
+      Object.keys(this.formData).forEach(key => (this.formData[key] = undefined))
+      this.dialogVisible = false
+    },
+    // 修改用户密码赋值userId
+    editPwd(row) {
+      this.formData.username = row.username
+      this.formData.userId = row.userId
+      this.dialogVisible = true
+    },
     // 根据 ID 删除用户信息
     delRow(row) {
       this.listLoading = true
@@ -161,7 +250,7 @@ export default {
     },
     // 获取后台数据
     getData() {
-      let param = {...this.pageParam, data: this.queryForm}
+      let param = { ...this.pageParam, data: this.queryForm }
       queryUserListPage(param).then(res => {
         if (res.data.code === 200) {
           this.tableData = res.data.data.records
