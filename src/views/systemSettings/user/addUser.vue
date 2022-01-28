@@ -80,8 +80,8 @@
         </el-row>
       </el-form>
       <div slot="footer">
-        <el-button @click="onClose">取消</el-button>
-        <el-button type="primary" @click="handelConfirm">确定</el-button>
+        <el-button @click="onClose" :size="btnSize">取消</el-button>
+        <el-button type="primary" @click="handelConfirm" :size="btnSize">确定</el-button>
       </div>
     </el-dialog>
   </div>

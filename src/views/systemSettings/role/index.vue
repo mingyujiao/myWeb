@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-collapse accordion>
       <el-collapse-item title="查询">
-        <el-form ref="queryForm" :model="queryForm" label-width="80px">
+        <el-form ref="queryForm" :model="queryForm" label-width="80px" :size="btnSize">
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="角色编码">

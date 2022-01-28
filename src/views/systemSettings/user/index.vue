@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-collapse accordion>
       <el-collapse-item title="查询">
-        <el-form ref="queryForm" :model="queryForm" label-width="80px">
+        <el-form ref="queryForm" :model="queryForm" label-width="80px" :size="btnSize">
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="用户编码">
@@ -41,15 +41,15 @@
       <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
       <el-table-column fixed prop="username" label="用户名称" width="120" align="center"></el-table-column>
       <el-table-column fixed prop="userCode" label="用户编码" width="150" align="center"></el-table-column>
-      <el-table-column prop="email" label="邮箱" align="center"></el-table-column>
-      <el-table-column prop="phoneNum" label="手机号" align="center"></el-table-column>
-      <el-table-column prop="birthday" label="出生日期" align="center"></el-table-column>
+      <el-table-column prop="email" label="邮箱" min-width="180" align="center"></el-table-column>
+      <el-table-column prop="phoneNum" label="手机号" min-width="120" align="center"></el-table-column>
+      <el-table-column prop="birthday" label="出生日期" min-width="120" align="center"></el-table-column>
       <el-table-column prop="name" label="真实名称" width="120" align="center"></el-table-column>
       <el-table-column prop="idCard" label="身份证" width="120" align="center"></el-table-column>
       <el-table-column prop="nationality" label="民族" width="120" align="center"></el-table-column>
       <el-table-column prop="createDate" label="创建时间" width="200" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
-      <el-table-column label="操作" width="220" align="center">
+      <el-table-column label="操作" width="350" align="center">
         <template slot-scope="scope">
           <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary"
                      :size="btnSize"
@@ -61,6 +61,9 @@
           </el-button>
           <el-button plain @click.native.prevent="editPwd(scope.row)" type="warning" :size="btnSize">
             重置密码
+          </el-button>
+          <el-button plain @click.native.prevent="assRoles(scope.row)" type="success" :size="btnSize">
+            角色分配
           </el-button>
         </template>
       </el-table-column>
@@ -105,6 +108,7 @@
       </div>
     </el-dialog>
     <add-user ref="addUser"></add-user>
+    <assigning-roles ref="assRoles"></assigning-roles>
   </div>
 </template>
 
@@ -113,11 +117,13 @@
 import { deletesUserById, deletesUserByIds, queryUserListPage, resetPwd } from '@/api/user'
 import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, PAGE_SMALL, SUCCESS_MSG } from '@/utils/constant'
 import addUser from '@/views/systemSettings/user/addUser'
+import assigningRoles from '@/views/systemSettings/user/assigningRoles'
 import { getMd5Pwd } from '@/utils/crypto'
 
 export default {
   components: {
-    addUser
+    addUser,
+    assigningRoles
   },
   data() {
     const checkPwd = (rule, value, callback) => {
@@ -226,6 +232,10 @@ export default {
         }
         this.listLoading = false
       })
+    },
+    // 分配角色
+    assRoles(row) {
+      this.$refs.assRoles.show(row)
     },
     // 修改
     editRow(row) {
