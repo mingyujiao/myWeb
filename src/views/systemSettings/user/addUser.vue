@@ -1,18 +1,18 @@
 <template>
   <div>
     <el-dialog :visible.sync="dialogVisible" :title="titleName">
-      <el-form ref="elForm" :model="formData" :rules="rules" :size="btnSize" label-width="100px">
+      <el-form ref="elForm" :model="form" :rules="rules" :size="btnSize" label-width="100px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户编码" prop="userCode">
-              <el-input v-model="formData.userCode" placeholder="请输入用户编码" :maxlength="20" clearable
+              <el-input v-model="form.userCode" placeholder="请输入用户编码" :maxlength="20" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="用户名称" prop="username">
-              <el-input v-model="formData.username" placeholder="请输入用户名称" :maxlength="20" clearable
+              <el-input v-model="form.username" placeholder="请输入用户名称" :maxlength="20" clearable
                         :style="{width: '100%'}" autocomplete="off"
               ></el-input>
             </el-form-item>
@@ -21,14 +21,14 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="真实名称" prop="name">
-              <el-input v-model="formData.name" placeholder="请输入真实名称" :maxlength="20" clearable
+              <el-input v-model="form.name" placeholder="请输入真实名称" :maxlength="20" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="身份证" prop="idCard">
-              <el-input v-model="formData.idCard" placeholder="请输入身份证" :maxlength="20" clearable
+              <el-input v-model="form.idCard" placeholder="请输入身份证" :maxlength="20" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
@@ -37,13 +37,13 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="民族" prop="nationality">
-              <el-input v-model="formData.nationality" placeholder="请输入民族" clearable :style="{width: '100%'}">
+              <el-input v-model="form.nationality" placeholder="请输入民族" clearable :style="{width: '100%'}">
               </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="phoneNum">
-              <el-input v-model="formData.phoneNum" placeholder="请输入手机号" :maxlength="11" clearable
+              <el-input v-model="form.phoneNum" placeholder="请输入手机号" :maxlength="11" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
@@ -52,29 +52,29 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="邮箱" prop="email">
-              <el-input v-model="formData.email" placeholder="请输入邮箱" clearable :style="{width: '100%'}">
+              <el-input v-model="form.email" placeholder="请输入邮箱" clearable :style="{width: '100%'}">
               </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="出生日期">
-              <el-date-picker v-model="formData.birthday" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+              <el-date-picker v-model="form.birthday" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
                               :style="{width: '100%'}" placeholder="请选择出生日期" clearable
               ></el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" v-if="!formData.userId">
+          <el-col :span="12" v-if="!form.userId">
             <el-form-item label="密码" prop="password">
-              <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
+              <el-input v-model="form.password" placeholder="请输入密码" clearable show-password
                         :style="{width: '100%'}" autocomplete="off" type="password"
               ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="启用" prop="state">
-              <el-switch v-model="formData.state" :active-value="0" :inactive-value="1"></el-switch>
+              <el-switch v-model="form.state" :active-value="0" :inactive-value="1"></el-switch>
             </el-form-item>
           </el-col>
         </el-row>
@@ -134,7 +134,7 @@ export default {
       btnSize: BTN_SIZE,
       dialogVisible: false,
       titleName: '',
-      formData: {
+      form: {
         userId: undefined,
         userCode: undefined,
         username: undefined,
@@ -186,31 +186,31 @@ export default {
       this.titleName = '添加用户'
       if (val) {
         this.titleName = '修改用户'
-        this.formData = {...val}
+        this.form = {...val}
       }
       this.dialogVisible = true
     },
     onClose() {
       this.$refs['elForm'].resetFields()
-      Object.keys(this.formData).forEach(key => (this.formData[key] = undefined))
-      this.formData.state = 0
+      Object.keys(this.form).forEach(key => (this.form[key] = undefined))
+      this.form.state = 0
       this.dialogVisible = false
     },
     handelConfirm() {
       this.$refs['elForm'].validate(valid => {
         if (!valid) return
-        let pwd = this.formData.password
-        if (!this.formData.userId) {
+        let pwd = this.form.password
+        if (!this.form.userId) {
           // 将用户输入的密码进行 MD5 加密
-          this.formData.password = getMd5Pwd(this.formData.password)
+          this.form.password = getMd5Pwd(this.form.password)
         }
-        saveUser(this.formData).then(res => {
+        saveUser(this.form).then(res => {
           if (res.data.code === 200) {
             this.$message.success(SUCCESS_MSG)
             this.onClose()
             this.$parent.getData()
           } else {
-            this.formData.password = pwd
+            this.form.password = pwd
             this.$message.error(res.data.message)
           }
         })

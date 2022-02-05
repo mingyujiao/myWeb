@@ -1,5 +1,5 @@
-// 全局按钮大小
-export const BTN_SIZE = 'medium'
+// 全局按钮大小 medium / small / mini
+export const BTN_SIZE = 'mini'
 
 // 是否启用小分页
 export const PAGE_SMALL = false

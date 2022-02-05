@@ -50,7 +50,7 @@
       <el-table-column prop="createDate" label="创建时间" width="200" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
       <el-table-column label="操作" width="350" align="center">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary"
                      :size="btnSize"
           >
@@ -82,11 +82,11 @@
       </el-pagination>
     </div>
     <el-dialog :visible.sync="dialogVisible" title="修改密码">
-      <el-form ref="elForm" :model="formData" :rules="rules" :size="btnSize" label-width="100px">
+      <el-form ref="elForm" :model="form" :rules="rules" :size="btnSize" label-width="100px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="新密码" prop="password">
-              <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
+              <el-input v-model="form.password" placeholder="请输入密码" clearable show-password
                         :style="{width: '100%'}" autocomplete="off" type="password"
               ></el-input>
             </el-form-item>
@@ -95,7 +95,7 @@
         <el-row>
           <el-col :span="24">
             <el-form-item label="确认密码" prop="enterPwd">
-              <el-input v-model="formData.enterPwd" placeholder="请输入密码" clearable show-password
+              <el-input v-model="form.enterPwd" placeholder="请输入密码" clearable show-password
                         :style="{width: '100%'}" autocomplete="off" type="password"
               ></el-input>
             </el-form-item>
@@ -127,8 +127,8 @@ export default {
   },
   data() {
     const checkPwd = (rule, value, callback) => {
-      if (this.formData.password && this.formData.enterPwd) {
-        if (this.formData.password !== this.formData.enterPwd) {
+      if (this.form.password && this.form.enterPwd) {
+        if (this.form.password !== this.form.enterPwd) {
           return callback(new Error('密码不一致'))
         }
       }
@@ -145,7 +145,7 @@ export default {
         name: null,
         userCode: null
       },
-      formData: {
+      form: {
         username: undefined,
         userId: undefined,
         password: undefined,
@@ -175,17 +175,17 @@ export default {
     handelConfirm() {
       this.$refs['elForm'].validate(valid => {
         if (!valid) return
-        let pwd = this.formData.password
-        this.formData.password = getMd5Pwd(this.formData.password)
-        this.formData.enterPwd = getMd5Pwd(this.formData.enterPwd)
-        resetPwd(this.formData).then(res => {
+        let pwd = this.form.password
+        this.form.password = getMd5Pwd(this.form.password)
+        this.form.enterPwd = getMd5Pwd(this.form.enterPwd)
+        resetPwd(this.form).then(res => {
         if (res.data.code === 200) {
           this.$message.success(SUCCESS_MSG)
           this.onClose()
           this.getData()
         } else {
-          this.formData.password = pwd
-          this.formData.enterPwd = pwd
+          this.form.password = pwd
+          this.form.enterPwd = pwd
           this.$message.error(res.data.message)
         }
       })
@@ -193,13 +193,13 @@ export default {
     },
     // 重置密码关闭弹窗
     onClose() {
-      Object.keys(this.formData).forEach(key => (this.formData[key] = undefined))
+      Object.keys(this.form).forEach(key => (this.form[key] = undefined))
       this.dialogVisible = false
     },
     // 修改用户密码赋值userId
     editPwd(row) {
-      this.formData.username = row.username
-      this.formData.userId = row.userId
+      this.form.username = row.username
+      this.form.userId = row.userId
       this.dialogVisible = true
     },
     // 根据 ID 删除用户信息

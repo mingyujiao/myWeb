@@ -96,6 +96,12 @@ export const constantRoutes = [
         component: () => import('@/views/systemSettings/role/index'),
         meta: { title: '系统角色', icon: 'el-icon-user-solid' }
       },
+      {
+        path: 'org',
+        name: '机构管理',
+        component: () => import('@/views/systemSettings/org/index'),
+        meta: { title: '机构管理', icon: 'el-icon-office-building' }
+      },
     ]
   },
 
