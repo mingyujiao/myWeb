@@ -73,10 +73,10 @@
         :small="pageSmall"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="pageParam.current"
+        :current-page="pageParam.pageNum"
         :page-sizes="[10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
-        :page-size="pageParam.size"
+        :page-size="pageParam.pageSize"
         :total="pageParam.total"
       >
       </el-pagination>
@@ -116,8 +116,8 @@
 
 import { deletesUserById, deletesUserByIds, queryUserListPage, resetPwd } from '@/api/user'
 import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, PAGE_SMALL, SUCCESS_MSG } from '@/utils/constant'
-import addUser from '@/views/systemSettings/user/addUser'
-import assigningRoles from '@/views/systemSettings/user/assigningRoles'
+import addUser from '@/views/system/user/addUser'
+import assigningRoles from '@/views/system/user/assigningRoles'
 import { getMd5Pwd } from '@/utils/crypto'
 
 export default {
@@ -163,8 +163,8 @@ export default {
         ]
       },
       pageParam: {
-        current: 1,
-        size: 10,
+        pageNum: 1,
+        pageSize: 10,
         total: 0
       },
       tableData: []
@@ -260,6 +260,8 @@ export default {
     },
     // 获取后台数据
     getData() {
+      debugger
+      console.log(this.pageParam)
       let param = { ...this.pageParam, data: this.queryForm }
       queryUserListPage(param).then(res => {
         if (res.data.code === 200) {
@@ -271,10 +273,12 @@ export default {
       })
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
+      this.pageParam.pageSize = val
+      this.getData()
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      this.pageParam.pageNum = val
+      this.getData()
     }
   },
   created() {

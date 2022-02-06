@@ -5,13 +5,13 @@
         <el-form ref="queryForm" :model="queryForm" label-width="80px" :size="btnSize">
           <el-row :gutter="20">
             <el-col :span="6">
-              <el-form-item label="机构编码">
-                <el-input v-model="queryForm.orgCode"></el-input>
+              <el-form-item label="角色编码">
+                <el-input v-model="queryForm.roleCode"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="机构名称">
-                <el-input v-model="queryForm.orgName"></el-input>
+              <el-form-item label="角色名称">
+                <el-input v-model="queryForm.roleName"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -25,18 +25,18 @@
       </el-collapse-item>
     </el-collapse>
     <div>
-      <el-button type="primary" plain icon="el-icon-plus" @click="addOrg" :size="btnSize">添 加</el-button>
-      <el-button type="danger" plain icon="el-icon-delete" @click="delOrg" :size="btnSize">删 除</el-button>
+      <el-button type="primary" plain icon="el-icon-plus" @click="addRole" :size="btnSize">添 加</el-button>
+      <el-button type="danger" plain icon="el-icon-delete" @click="delRole" :size="btnSize">删 除</el-button>
     </div>
     <el-table border :data="tableData" style="width: 100%; height: 100%;"
-              :size="btnSize" stripe v-loading="listLoading" row-key="orgId"
-              :tree-props="{children: 'children'}">
+              :size="btnSize" stripe v-loading="listLoading"
               @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
-      <el-table-column fixed prop="orgName" label="机构名称"></el-table-column>
-      <el-table-column fixed prop="orgCode" label="机构编码" align="center"></el-table-column>
-      <el-table-column fixed prop="sortIndex" label="排序" align="center"></el-table-column>
+      <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
+      <el-table-column fixed prop="roleName" label="角色名称" width="120" align="center"></el-table-column>
+      <el-table-column fixed prop="roleCode" label="角色编码" width="150" align="center"></el-table-column>
+      <el-table-column prop="roleDescription" label="角色描述" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
       <el-table-column label="操作" width="120" align="center">
         <template v-slot="scope">
@@ -51,30 +51,48 @@
         </template>
       </el-table-column>
     </el-table>
-    <add-org ref="addOrg"></add-org>
+    <div style="text-align: right">
+      <el-pagination
+        :small="pageSmall"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageParam.pageNum"
+        :page-sizes="[2, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-size="pageParam.pageSize"
+        :total="pageParam.total"
+      >
+      </el-pagination>
+    </div>
+    <add-role ref="addRole"></add-role>
   </div>
 </template>
 
 <script>
 
-import { deletesOrgById, deletesOrgByIds, queryOrgList } from '@/api/org'
-import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, SUCCESS_MSG } from '@/utils/constant'
-import addOrg from '@/views/systemSettings/org/addOrg'
-import { getTreeData } from '@/utils/common'
+import { deletesRoleById, deletesRoleByIds, queryRoleListPage } from '@/api/role'
+import { BTN_SIZE, DEL_NULL_MSG, ERR_MSG, PAGE_SMALL, SUCCESS_MSG } from '@/utils/constant'
+import addRole from '@/views/system/role/addRole'
 
 export default {
   components: {
-    addOrg
+    addRole
   },
   data() {
     return {
       dialogVisible: false,
       selections: [],
       listLoading: false,
+      pageSmall: PAGE_SMALL,
       btnSize: BTN_SIZE,
       queryForm: {
-        orgCode: null,
-        orgName: null
+        roleCode: null,
+        roleName: null
+      },
+      pageParam: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
       },
       tableData: []
     }
@@ -83,7 +101,7 @@ export default {
     // 根据 ID 删除用户信息
     delRow(row) {
       this.listLoading = true
-      deletesOrgById(row.userId).then(res => {
+      deletesRoleById(row.userId).then(res => {
         if (res.data.code === 200) {
           this.$message.success(SUCCESS_MSG)
           this.getData()
@@ -94,14 +112,14 @@ export default {
       })
     },
     // 删除用户信息
-    delOrg() {
+    delRole() {
       if (this.selections.length === 0) {
         this.$message.warning(DEL_NULL_MSG)
         return
       }
       let delIds = this.selections.map(item => item.userId)
       this.listLoading = true
-      deletesOrgByIds(delIds).then(res => {
+      deletesRoleByIds(delIds).then(res => {
         if (res.data.code === 200) {
           this.$message.success(SUCCESS_MSG)
           this.getData()
@@ -113,15 +131,15 @@ export default {
     },
     // 修改
     editRow(row) {
-      this.$refs.addOrg.show(row)
+      this.$refs.addRole.show(row)
     },
     // 多选
     handleSelectionChange(val) {
       this.selections = val
     },
     // 添加用户
-    addOrg() {
-      this.$refs.addOrg.show()
+    addRole() {
+      this.$refs.addRole.show()
     },
     // 查询
     queryData() {
@@ -134,15 +152,24 @@ export default {
     },
     // 获取后台数据
     getData() {
-      let param = { data: this.queryForm }
-      queryOrgList(param).then(res => {
+      let param = { ...this.pageParam, data: this.queryForm }
+      queryRoleListPage(param).then(res => {
         if (res.data.code === 200) {
-          this.tableData = getTreeData(res.data.data, null)
+          this.tableData = res.data.data.records
+          this.pageParam.total = res.data.data.total
         } else {
           this.$message.warning(ERR_MSG)
         }
       })
     },
+    handleSizeChange(val) {
+      this.pageParam.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.pageParam.pageNum = val
+      this.getData()
+    }
   },
   created() {
     this.getData()

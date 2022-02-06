@@ -78,7 +78,7 @@ export const constantRoutes = [
   },
 
   {
-    path: '/systemSettings',
+    path: '/system',
     component: Layout,
     // redirect: '/example/table',
     name: '系统管理',
@@ -87,20 +87,26 @@ export const constantRoutes = [
       {
         path: 'user',
         name: '用户管理',
-        component: () => import('@/views/systemSettings/user/index'),
+        component: () => import('@/views/system/user/index'),
         meta: { title: '用户管理', icon: 'el-icon-user' }
       },
       {
         path: 'role',
         name: '系统角色',
-        component: () => import('@/views/systemSettings/role/index'),
+        component: () => import('@/views/system/role/index'),
         meta: { title: '系统角色', icon: 'el-icon-user-solid' }
       },
       {
         path: 'org',
         name: '机构管理',
-        component: () => import('@/views/systemSettings/org/index'),
+        component: () => import('@/views/system/org/index'),
         meta: { title: '机构管理', icon: 'el-icon-office-building' }
+      },
+      {
+        path: 'menu',
+        name: '菜单管理',
+        component: () => import('@/views/system/menu/index'),
+        meta: { title: '菜单管理', icon: 'el-icon-menu' }
       },
     ]
   },
