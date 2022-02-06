@@ -63,8 +63,12 @@
               ></el-date-picker>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
+          <el-col :span="12">
+            <el-form-item label="所属机构" prop="parentId">
+              <el-tree-select :styles="{ width: '100%'}" v-model="form.orgId" :selectParams="selectParams"
+                              :treeParams="treeParams" ref="treeSelect"/>
+            </el-form-item>
+          </el-col>
           <el-col :span="12" v-if="!form.userId">
             <el-form-item label="密码" prop="password">
               <el-input v-model="form.password" placeholder="请输入密码" clearable show-password
@@ -92,6 +96,8 @@ import { saveUser } from '@/api/user'
 import { BTN_SIZE, SUCCESS_MSG } from '@/utils/constant'
 import { isNumber, validIdCard, validNumStr, validPhoneNum } from '@/utils/validate'
 import { getMd5Pwd } from '@/utils/crypto'
+import { queryAllOrgList } from '@/api/org'
+import { getTreeData } from '@/utils/common'
 
 export default {
   name: 'add',
@@ -131,6 +137,25 @@ export default {
       return callback()
     }
     return {
+      selectParams: {
+        multiple: true,
+        clearable: true,
+        placeholder: '请选择'
+      },
+      treeParams: {
+        clickParent: true, // 是否可以选择父节点
+        filterable: false, // 搜索
+        'check-strictly': true,
+        'default-expand-all': false,
+        'expand-on-click-node': false,
+        data: [],
+        props: {
+          children: 'children',
+          label: 'orgName',
+          disabled: 'disabled',
+          value: 'orgId'
+        }
+      },
       btnSize: BTN_SIZE,
       dialogVisible: false,
       titleName: '',
@@ -139,6 +164,7 @@ export default {
         userCode: undefined,
         username: undefined,
         password: undefined,
+        orgId: undefined,
         state: 0,
         name: undefined,
         idCard: undefined,
@@ -182,7 +208,19 @@ export default {
   mounted() {
   },
   methods: {
+    // 获取所有机构信息
+    getAllOrgData() {
+      queryAllOrgList({}).then(res => {
+        if (res.data.code === 200) {
+          let data = getTreeData(res.data.data, null)
+          this.$refs.treeSelect.treeDataUpdateFun(data)
+        } else {
+          this.$refs.treeSelect.treeDataUpdateFun([])
+        }
+      })
+    },
     show(val) {
+      this.getAllOrgData()
       this.titleName = '添加用户'
       if (val) {
         this.titleName = '修改用户'

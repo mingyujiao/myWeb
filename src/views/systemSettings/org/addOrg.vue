@@ -85,16 +85,6 @@ export default {
           value: 'orgId'
         }
       },
-      treeData: [
-        {
-          value: 1,
-          label: 'text1',
-          children: [{ value: 5, label: 'text5' }, { value: 6, label: 'text6' }]
-        },
-        { value: 2, label: 'text2' },
-        { value: 3, label: 'text3' },
-        { value: 4, label: 'text5' }
-      ],
       btnSize: BTN_SIZE,
       dialogVisible: false,
       titleName: '',
@@ -156,6 +146,7 @@ export default {
       this.$refs['elForm'].resetFields()
       Object.keys(this.form).forEach(key => (this.form[key] = undefined))
       this.form.state = 0
+      this.form.sortIndex = 100
       this.dialogVisible = false
     },
     handelConfirm() {

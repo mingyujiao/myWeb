@@ -39,8 +39,8 @@
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
-      <el-table-column fixed prop="username" label="用户名称" width="120" align="center"></el-table-column>
-      <el-table-column fixed prop="userCode" label="用户编码" width="150" align="center"></el-table-column>
+      <el-table-column fixed prop="username" label="用户名称" width="100" align="center"></el-table-column>
+      <el-table-column fixed prop="userCode" label="用户编码" width="100" align="center"></el-table-column>
       <el-table-column prop="email" label="邮箱" min-width="180" align="center"></el-table-column>
       <el-table-column prop="phoneNum" label="手机号" min-width="120" align="center"></el-table-column>
       <el-table-column prop="birthday" label="出生日期" min-width="120" align="center"></el-table-column>
@@ -49,7 +49,7 @@
       <el-table-column prop="nationality" label="民族" width="120" align="center"></el-table-column>
       <el-table-column prop="createDate" label="创建时间" width="200" align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
-      <el-table-column label="操作" width="350" align="center">
+      <el-table-column fixed="right" label="操作" width="280" align="center">
         <template v-slot="scope">
           <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary"
                      :size="btnSize"
