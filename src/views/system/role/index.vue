@@ -36,7 +36,7 @@
       <el-table-column fixed type="index" width="50" label="序号" align="center"></el-table-column>
       <el-table-column fixed prop="roleName" label="角色名称" width="120" align="center"></el-table-column>
       <el-table-column fixed prop="roleCode" label="角色编码" width="150" align="center"></el-table-column>
-      <el-table-column prop="roleDescription" label="角色描述" align="center"></el-table-column>
+      <el-table-column prop="roleDescription" label="角色描述" header-align="center"></el-table-column>
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
       <el-table-column label="操作" width="120" align="center">
         <template v-slot="scope">

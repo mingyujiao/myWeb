@@ -54,7 +54,7 @@ import { BTN_SIZE, SUCCESS_MSG } from '@/utils/constant'
 import { validNumStr } from '@/utils/validate'
 
 export default {
-  name: 'add',
+  name: 'addRole',
   components: {},
   props: [],
   data() {

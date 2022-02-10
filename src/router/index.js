@@ -82,7 +82,7 @@ export const constantRoutes = [
     component: Layout,
     // redirect: '/example/table',
     name: '系统管理',
-    meta: { title: '系统管理', icon: 'el-icon-s-help' },
+    meta: { title: '系统管理', icon: 'el-icon-setting' },
     children: [
       {
         path: 'user',

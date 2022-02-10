@@ -30,8 +30,7 @@
     </div>
     <el-table border :data="tableData" style="width: 100%; height: 100%;"
               :size="btnSize" stripe v-loading="listLoading" row-key="orgId"
-              :tree-props="{children: 'children'}">
-              @selection-change="handleSelectionChange"
+              :tree-props="{children: 'children'}" @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column fixed prop="orgName" label="机构名称"></el-table-column>
@@ -137,7 +136,7 @@ export default {
       let param = { data: this.queryForm }
       queryOrgList(param).then(res => {
         if (res.data.code === 200) {
-          this.tableData = getTreeData(res.data.data, null)
+          this.tableData = getTreeData(res.data.data, null, "orgId")
         } else {
           this.$message.warning(ERR_MSG)
         }

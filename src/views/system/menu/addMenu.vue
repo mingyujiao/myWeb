@@ -4,23 +4,35 @@
       <el-form ref="elForm" :model="form" :rules="rules" :size="btnSize" label-width="100px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="机构编码" prop="orgCode">
-              <el-input v-model="form.orgCode" placeholder="请输入机构编码" :maxlength="20" clearable
+            <el-form-item label="菜单名称" prop="title">
+              <el-input v-model="form.title" placeholder="请输入菜单名称" :maxlength="20" clearable
                         :style="{width: '100%'}"
               ></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="机构名称" prop="orgName">
-              <el-input v-model="form.orgName" placeholder="请输入机构名称" :maxlength="20" clearable
+            <el-form-item label="图标" prop="icon">
+              <el-input v-model="form.icon" placeholder="请输入角色名称" :maxlength="20" clearable
                         :style="{width: '100%'}" autocomplete="off"
               ></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
-            <el-form-item label="上级部门" prop="parentId">
+            <el-form-item label="路由地址" prop="menuPath">
+              <el-input v-model="form.menuPath" placeholder="请输入path" :maxlength="255" clearable
+                        :style="{width: '100%'}" autocomplete="off"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="路由全地址" prop="component">
+              <el-input v-model="form.component" placeholder="对应component" :maxlength="255" clearable
+                        :style="{width: '100%'}" autocomplete="off"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="上级菜单" prop="parentId">
               <el-tree-select :styles="{ width: '100%'}" v-model="form.parentId" :selectParams="selectParams"
                               :treeParams="treeParams" ref="treeSelect"
               />
@@ -31,8 +43,6 @@
               <el-input-number v-model="form.sortIndex" style="width: 100%" :step="5"></el-input-number>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
             <el-form-item label="启用" prop="state">
               <el-switch v-model="form.state" :active-value="0" :inactive-value="1"></el-switch>
@@ -49,23 +59,15 @@
 </template>
 
 <script>
-import { queryAllOrgList, saveOrg } from '@/api/org'
+import { queryAllMenu, saveMenu } from '@/api/menu'
 import { BTN_SIZE, SUCCESS_MSG } from '@/utils/constant'
-import { validNumStr } from '@/utils/validate'
 import { getTreeData } from '@/utils/common'
 
 export default {
-  name: 'addOrg',
+  name: 'addMenu',
   components: {},
   props: [],
   data() {
-    // 校验机构编码
-    const checkOrgCode = (rule, value, callback) => {
-      if (!validNumStr(value)) {
-        return callback(new Error('请输入英文或数字'))
-      }
-      return callback()
-    }
     return {
       selectParams: {
         multiple: true,
@@ -81,34 +83,39 @@ export default {
         data: [],
         props: {
           children: 'children',
-          label: 'orgName',
+          label: 'title',
           disabled: 'disabled',
-          value: 'orgId'
+          value: 'menuId'
         }
       },
       btnSize: BTN_SIZE,
       dialogVisible: false,
       titleName: '',
       form: {
-        orgId: undefined,
-        orgCode: undefined,
-        orgName: undefined,
+        menuId: undefined,
+        title: undefined,
+        icon: undefined,
+        menuPath: undefined,
+        component: undefined,
         parentId: undefined,
         sortIndex: 100,
-        state: 0
+        state: 0,
+        roleDescription: undefined
       },
       rules: {
-        orgCode: [
-          { required: true, message: '请输入机构编码', trigger: 'blur' },
-          { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' },
-          { validator: checkOrgCode, trigger: 'blur' }
+        title: [
+          { required: true, message: '请输入菜单名称', trigger: 'blur' },
+          { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' }
         ],
-        orgName: [
-          { required: true, message: '请输入机构名称', trigger: 'blur' },
+        icon: [
+          { required: true, message: '请输入图标', trigger: 'blur' },
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
-        sortIndex: [
-          { required: true, message: '请输入排序值', trigger: 'blur' }
+        component: [
+          { min: 2, max: 255, message: '长度在 2 到 255 个字符', trigger: 'blur' },
+        ],
+        menuPath: [
+          { min: 2, max: 255, message: '长度在 2 到 255 个字符', trigger: 'blur' },
         ]
       }
     }
@@ -121,11 +128,12 @@ export default {
   },
   methods: {
     getAllOrgData(val) {
-      let param = { orgId: val ? val.orgId : null }
-      queryAllOrgList(param).then(res => {
+      let param = { menuId: val ? val.menuId : null }
+      queryAllMenu(param).then(res => {
         if (res.data.code === 200) {
-          let data = getTreeData(res.data.data, null, "orgId")
+          let data = getTreeData(res.data.data, null, "menuId")
           this.$refs.treeSelect.treeDataUpdateFun(data)
+          console.log(1)
         } else {
           this.$refs.treeSelect.treeDataUpdateFun([])
         }
@@ -133,9 +141,9 @@ export default {
     },
     show(val) {
       this.getAllOrgData(val)
-      this.titleName = '添加机构'
+      this.titleName = '添加菜单'
       if (val) {
-        this.titleName = '修改机构'
+        this.titleName = '修改菜单'
         this.form = { ...val }
       }
       this.dialogVisible = true
@@ -150,7 +158,7 @@ export default {
     handelConfirm() {
       this.$refs['elForm'].validate(valid => {
         if (!valid) return
-        saveOrg(this.form).then(res => {
+        saveMenu(this.form).then(res => {
           if (res.data.code === 200) {
             this.$message.success(SUCCESS_MSG)
             this.onClose()

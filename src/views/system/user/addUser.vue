@@ -100,7 +100,7 @@ import { queryAllOrgList } from '@/api/org'
 import { getTreeData } from '@/utils/common'
 
 export default {
-  name: 'add',
+  name: 'addUser',
   components: {},
   props: [],
   data() {
