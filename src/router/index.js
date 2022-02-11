@@ -107,7 +107,7 @@ export const constantRoutes = [
         name: '菜单管理',
         component: () => import('@/views/system/menu/index'),
         meta: { title: '菜单管理', icon: 'el-icon-menu' }
-      },
+      }
     ]
   },
 

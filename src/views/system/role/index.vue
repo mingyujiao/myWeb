@@ -40,14 +40,9 @@
       <el-table-column prop="state" label="启用" width="120" align="center"></el-table-column>
       <el-table-column label="操作" width="120" align="center">
         <template v-slot="scope">
-          <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary"
-                     :size="btnSize"
-          >
-          </el-button>
-          <el-button circle @click.native.prevent="delRow(scope.row)" icon="el-icon-delete" type="danger"
-                     :size="btnSize"
-          >
-          </el-button>
+          <el-button circle @click.native.prevent="editRow(scope.row)" icon="el-icon-edit" type="primary" :size="btnSize"></el-button>
+          <el-button circle @click.native.prevent="delRow(scope.row)" icon="el-icon-delete" type="danger" :size="btnSize"></el-button>
+          <el-button plain @click.native.prevent="assMenu(scope.row)" type="success" :size="btnSize">菜单分配</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -98,6 +93,10 @@ export default {
     }
   },
   methods: {
+    // 菜单授权
+    assMenu(row) {
+
+    },
     // 根据 ID 删除用户信息
     delRow(row) {
       this.listLoading = true
